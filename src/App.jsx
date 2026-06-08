@@ -13,33 +13,49 @@ import {
 import LeftPane from './components/LeftPane';
 import RightPane from './components/RightPane';
 
-const DEFAULT_DART_CODE = `// AST Finder — Dart Example
-// 1. Define the Class
-class Robot {
-  // Property
-  String name = '';
-
-  // Method
-  void sayHello() {
-    print('Hello, my name is $name!');
-  }
-}
-
+const TEMPLATES = {
+  dart: `// AST Finder Dart Demo
 void main() {
-  // 2. Create the Object here
-  Robot myRobot = Robot();
-
-  // Set the name
-  myRobot.name = 'RoboX';
-
-  // Call the method
-  myRobot.sayHello();
+  var app = ASTFinder(
+    name: 'AST Finder',
+    version: '1.0.0',
+  );
+  app.start();
 }
-`;
+
+class ASTFinder {
+  final String name;
+  final String version;
+
+  ASTFinder({required this.name, required this.version});
+
+  void start() {
+    print('Starting $name v$version');
+  }
+}`,
+  yaml: `# AST Finder YAML Demo
+app:
+  name: "AST Finder"
+  version: "1.0.0"
+  features:
+    - name: "Tree-Sitter Parsing"
+      enabled: true
+      supported_languages:
+        - dart
+        - yaml
+    - name: "Interactive AST Tree"
+      enabled: true
+  database:
+    host: "localhost"
+    port: 5432
+    options:
+      ssl: true
+      timeout: 5000`
+};
 
 function App() {
   // State
-  const [code, setCode] = useState(DEFAULT_DART_CODE);
+  const [code, setCode] = useState(TEMPLATES.dart);
   const [language, setLanguage] = useState('dart');
   const [selectedLine, setSelectedLine] = useState(null);
   const [selectedColumn, setSelectedColumn] = useState(null);
@@ -236,6 +252,15 @@ function App() {
     setCode(value || '');
   }, []);
 
+  const handleLanguageChange = useCallback((newLang) => {
+    setLanguage(newLang);
+    const prevTemplate = TEMPLATES[language];
+    const nextTemplate = TEMPLATES[newLang];
+    if (!code.trim() || code.trim() === (prevTemplate ? prevTemplate.trim() : '')) {
+      setCode(nextTemplate);
+    }
+  }, [code, language]);
+
   const handleQueryChange = useCallback((value) => {
     setQueryString(value);
   }, []);
@@ -296,6 +321,16 @@ function App() {
           </div>
         </div>
 
+        {/* Multi-selection tips */}
+        <div className="hidden md:flex items-center gap-2 px-3 py-1 rounded-full bg-accent-violet/5 border border-accent-violet/10 text-xs text-text-secondary">
+          <svg className="w-3.5 h-3.5 text-accent-violet shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>
+            Tip: Use <kbd className="px-1.5 py-0.5 text-[10px] font-semibold text-accent-violet bg-accent-violet/10 rounded border border-accent-violet/20 font-mono">Alt</kbd> + <kbd className="px-1.5 py-0.5 text-[10px] font-semibold text-accent-violet bg-accent-violet/10 rounded border border-accent-violet/20 font-mono">Click</kbd> to select multiple elements
+          </span>
+        </div>
+
         {/* Status indicators */}
         <div className="flex items-center gap-3">
           {tsError && (
@@ -338,7 +373,7 @@ function App() {
             code={code}
             language={language}
             onCodeChange={handleCodeChange}
-            onLanguageChange={setLanguage}
+            onLanguageChange={handleLanguageChange}
             onCursorChange={handleCursorChange}
             onSelectionRangeChange={handleSelectionRangeChange}
             onAltClick={handleAltClick}

@@ -1,7 +1,8 @@
 import { memo } from 'react';
 
 const LANGUAGES = [
-  { id: 'dart', label: 'Dart', icon: '🎯' },
+  { id: 'dart', label: 'Dart' },
+  { id: 'yaml', label: 'YAML' },
 ];
 
 /**
@@ -18,7 +19,7 @@ function LanguageSelector({ selectedLanguage, onLanguageChange }) {
           appearance-none cursor-pointer
           bg-surface-700 text-text-primary
           border border-border rounded-lg
-          px-3 py-1.5 pr-8
+          px-3 py-1.5 pr-8 min-w-28
           text-sm font-medium font-mono
           hover:bg-surface-600 hover:border-surface-400
           focus-ring-glow
@@ -27,7 +28,7 @@ function LanguageSelector({ selectedLanguage, onLanguageChange }) {
       >
         {LANGUAGES.map((lang) => (
           <option key={lang.id} value={lang.id}>
-            {lang.icon} {lang.label}
+            {lang.label}
           </option>
         ))}
       </select>

@@ -213,7 +213,7 @@ const CodeEditor = forwardRef(function CodeEditor({
     <div className="h-full w-full flex flex-col rounded-lg overflow-hidden border border-border glow-violet">
       <Editor
         height="100%"
-        defaultLanguage={language}
+        language={language}
         value={code}
         onChange={onChange}
         onMount={handleMount}

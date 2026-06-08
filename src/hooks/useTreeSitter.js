@@ -35,6 +35,7 @@ export function useTreeSitter(languageId = 'dart') {
         // Map language IDs to WASM file paths
         const wasmMap = {
           dart: '/tree-sitter-dart.wasm',
+          yaml: '/tree-sitter-yaml.wasm',
         };
 
         const wasmPath = wasmMap[languageId];
@@ -79,8 +80,8 @@ export function useTreeSitter(languageId = 'dart') {
       let activeTree = parserRef.current.parse(sourceCode);
       let isWrapped = false;
 
-      // Check if raw code has errors and wrapping could fix it
-      if (activeTree.rootNode.hasError) {
+      // Check if raw code has errors and wrapping could fix it (only for Dart)
+      if (languageId === 'dart' && activeTree.rootNode.hasError) {
         let wrappedCode = sourceCode.trim();
         if (!wrappedCode.endsWith(';')) {
           wrappedCode += ';';
@@ -108,7 +109,7 @@ export function useTreeSitter(languageId = 'dart') {
       console.error('Parse error:', err);
       return null;
     }
-  }, []);
+  }, [languageId]);
 
   // Run a tree-sitter query and return captures
   const runQuery = useCallback((queryString) => {
